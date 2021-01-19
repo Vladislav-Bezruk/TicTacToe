@@ -17,7 +17,14 @@ struct ACOORD {
 
 	ACOORD(int size) {
 		data = new COORD[size];
-		pos = 0;
+		pos = -1;
+	}
+
+	void add(int x, int y) {
+		pos++;
+
+		data[pos].x = x; 
+		data[pos].y = y;
 	}
 };
 
@@ -181,6 +188,13 @@ DATA calc(MAP map, int player, int cPlayer) {
 
 ACOORD getMaxData(DATA data) {
 	ACOORD coords(data.mSize * data.mSize);
+	int count = 0;
+
+	for (int x = 0; x < data.mSize; x++) {
+		for (int y = 0; y < data.mSize; y++) {
+
+		}
+	}
 
 	return coords;
 }

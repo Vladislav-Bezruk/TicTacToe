@@ -1,5 +1,21 @@
 ﻿#include <stdio.h>
 
+struct COORD {
+	int x;
+	int y;
+};
+
+struct ACOORD {
+	COORD * data;
+	int size;
+	int pos;
+
+	ACOORD(int size) {
+		data = new COORD[size];
+		pos = 0;
+	}
+};
+
 struct DATAU {
 	int import;
 	int prob[4][2];
@@ -153,7 +169,7 @@ DATA calc(MAP map, int player, int cPlayer) {
 		}
 	}
 
-	debugDATA(data); //debug
+	//debugDATA(data); //debug
 
 	return data;
 }

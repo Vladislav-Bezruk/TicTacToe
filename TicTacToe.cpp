@@ -3,6 +3,11 @@
 struct COORD {
 	int x;
 	int y;
+
+	COORD() {
+		x = 0;
+		y = 0;
+	}
 };
 
 struct ACOORD {
@@ -172,6 +177,19 @@ DATA calc(MAP map, int player, int cPlayer) {
 	//debugDATA(data); //debug
 
 	return data;
+}
+
+ACOORD getMaxData(DATA data) {
+	ACOORD coords(data.mSize * data.mSize);
+
+	return coords;
+}
+
+COORD getCoord(ACOORD coords) {
+	COORD coord;
+
+
+	return coord;
 }
 
 int main() {

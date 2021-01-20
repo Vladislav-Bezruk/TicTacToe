@@ -1,4 +1,7 @@
 ﻿#include <stdio.h>
+#include <cstdlib>
+#include <ctime>
+#include <math.h>
 
 struct COORD {
 	int x;
@@ -189,17 +192,19 @@ ACOORD getMaxData(DATA data) {
 		}
 	}
 
-	printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
-	printCoords(coords);
+	//printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
+	//printCoords(coords);
 
 	return coords;
 }
 
-COORD getCoord(ACOORD coords) {
-	COORD coord;
+int random(int a) {
+	return round((a - 1) * (double)(rand() % 100) / 100);
+}
 
-
-	return coord;
+COORD getRandomCoord(ACOORD coords) {
+	srand(time(NULL));
+	return coords.data[random(coords.size)];
 }
 
 DATA calc(MAP map, int player, int cPlayer) {
@@ -248,8 +253,7 @@ DATA calc(MAP map, int player, int cPlayer) {
 		}
 	}
 
-	debugDATA(data); //debug
-	getMaxData(data);
+	//debugDATA(data); //debug
 
 	return data;
 }
@@ -264,7 +268,9 @@ int main() {
 		}
 	}
 
-	calc(map, 1, 2);
+	printf("x = %d, y = %d\n", getRandomCoord(getMaxData(calc(map, 1, 2))).x, getRandomCoord(getMaxData(calc(map, 1, 2))).y);
+
+
 
 	return 0;
 }

@@ -39,8 +39,8 @@ struct CELL {
 
 	CELL() {
 		import = -2;
-		rept = 0;
-		type = 0;
+		type = 2;
+		rept = -1;
 	}
 };
 
@@ -53,7 +53,6 @@ struct DATAU {
 	void create(int cPlayer) {
 
 		value = new int* [4];
-
 
 		for (int i = 0; i < 4; i++) {
 			value[i] = new int[cPlayer + 1];
@@ -155,37 +154,60 @@ void printCoords(ACOORD coords) {
 	}
 }
 
-ACOORD getMaxData(DATA data) {
-	int count = 0, maxImport = -2, minType = 2, maxRept = -1;
+bool isMaxCell(CELL a, CELL b) {
+	if (a.import > b.import || a.import == b.import && a.type < b.type || a.import == b.import && a.type == b.type && a.rept > b.rept) {
+		return true;
+	}
+	return false;
+}
+
+CELL getMaxCell(DATA data) {
+	CELL cell;
 
 	for (int x = 0; x < data.mSize; x++) {
 		for (int y = 0; y < data.mSize; y++) {
-
-			if (data.data[x][y].cell.import > maxImport || data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type < minType || data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept > maxRept) {
-				count = 0;
-				maxImport = data.data[x][y].cell.import;
-				minType = data.data[x][y].cell.type;
-				maxRept = data.data[x][y].cell.rept;
+			if (isMaxCell(data.data[x][y].cell, cell)) {
+				cell = data.data[x][y].cell;
 			}
-		
+		}
+	}
 
-			if (data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept == maxRept) {
+	return cell;
+}
+
+bool isEqualCells(CELL a, CELL b) {
+	if (a.import == b.import && a.rept == b.rept && a.type == b.type) {
+		return true;
+	}
+	return false;
+}
+
+int countInData(DATA data, CELL maxCell) {
+	int count = 0;
+
+	for (int x = 0; x < data.mSize; x++) {
+		for (int y = 0; y < data.mSize; y++) {
+			if (isEqualCells(data.data[x][y].cell, maxCell)) {
 				count++;
 			}
 		}
 	}
 
-	ACOORD coords(count);
+	return count;
+}
+
+ACOORD getMaxData(DATA data) {
+	CELL maxCell = getMaxCell(data);
+	ACOORD coords(countInData(data, maxCell));
 
 	for (int x = 0; x < data.mSize; x++) { //add all coord
 		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept == maxRept) {
+			if (isEqualCells(data.data[x][y].cell, maxCell)) {
 				coords.add(x, y);
 			}
 		}
 	}
 
-	printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
 	printCoords(coords);
 
 	return coords;

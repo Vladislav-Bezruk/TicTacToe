@@ -58,11 +58,9 @@ struct DATAU {
 			value[i] = new int[cPlayer + 1];
 			prob[i][0] = prob[i][1] = -2;
 
-
 			for (int j = 0; j <= cPlayer; j++) {
 				value[i][j] = 0;
 			}
-
 		}
 
 		count = 0;
@@ -139,10 +137,12 @@ void debugDATA(DATA data) {
 			printf("\t type = %d\n", data.data[x][y].cell.type);
 			printf("\t rept = %d\n", data.data[x][y].cell.rept);
 
-			//for (int i = 0; i <= data.data[x][y].count; i++) {
+			/*
+			for (int i = 0; i <= data.data[x][y].count; i++) {
 			//	printf("\t \t count = %d\n", i);	
 			//	printf("\t \t \t prob0 = %d, prob1 = %d\n", data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);			
-			//}
+			}
+			*/
 		}
 	}
 }
@@ -208,7 +208,7 @@ ACOORD getMaxData(DATA data) {
 		}
 	}
 
-	printCoords(coords);
+	//printCoords(coords);
 
 	return coords;
 }
@@ -268,7 +268,7 @@ DATA calc(MAP map, int player, int cPlayer) {
 		}
 	}
 
-	debugDATA(data); //debug
+	//debugDATA(data); //debug
 
 	return data;
 }
@@ -283,9 +283,8 @@ int main() {
 		}
 	}
 
+	//test
 	printf("Result: x = %d, y = %d\n", getRandomCoord(getMaxData(calc(map, 1, 2))).x, getRandomCoord(getMaxData(calc(map, 1, 2))).y);
-
-
 
 	return 0;
 }

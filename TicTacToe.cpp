@@ -15,7 +15,8 @@ struct ACOORD {
 	int size;
 	int pos;
 
-	ACOORD(int size) {
+	ACOORD(int a) {
+		size = a;
 		data = new COORD[size];
 		pos = -1;
 	}
@@ -119,6 +120,7 @@ int isMax(int a, int b) {
 }
 
 void debugDATA(DATA data) {
+	printf("////debugDATA////\n");
 	for (int x = 0; x < data.mSize; x++) {
 		for (int y = 0; y < data.mSize; y++) {
 			printf("x = %d, y = %d\n", x, y);
@@ -133,6 +135,71 @@ void debugDATA(DATA data) {
 			//}
 		}
 	}
+}
+
+void printCoords(ACOORD coords) {
+	printf("////PrintResult:////\n");
+	for (int i = 0; i < coords.size; i++) {
+		printf("x = %d, y = %d\n", coords.data[i].x, coords.data[i].y);
+	}
+}
+
+ACOORD getMaxData(DATA data) {
+	int count = 0, maxImport = -2, minType = 2, maxRept = -1;
+
+	for (int x = 0; x < data.mSize; x++) { //calc maxImport
+		for (int y = 0; y < data.mSize; y++) {
+			if (data.data[x][y].import > maxImport) {
+				maxImport = data.data[x][y].import;
+			}
+		}
+	}
+
+	for (int x = 0; x < data.mSize; x++) { //calc minType
+		for (int y = 0; y < data.mSize; y++) {
+			if (data.data[x][y].import == maxImport && data.data[x][y].type < minType) {
+				minType = data.data[x][y].type;
+			}
+		}
+	}
+
+	for (int x = 0; x < data.mSize; x++) { //calc maxRept
+		for (int y = 0; y < data.mSize; y++) {
+			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept > maxRept) {
+				maxRept = data.data[x][y].rept;
+			}
+		}
+	}
+
+	for (int x = 0; x < data.mSize; x++) { //calc count
+		for (int y = 0; y < data.mSize; y++) {
+			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept == maxRept) {
+				count++;
+			}
+		}
+	}
+
+	ACOORD coords(count);
+
+	for (int x = 0; x < data.mSize; x++) { //add all coord
+		for (int y = 0; y < data.mSize; y++) {
+			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept == maxRept) {
+				coords.add(x, y);
+			}
+		}
+	}
+
+	printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
+	printCoords(coords);
+
+	return coords;
+}
+
+COORD getCoord(ACOORD coords) {
+	COORD coord;
+
+
+	return coord;
 }
 
 DATA calc(MAP map, int player, int cPlayer) {
@@ -181,29 +248,10 @@ DATA calc(MAP map, int player, int cPlayer) {
 		}
 	}
 
-	//debugDATA(data); //debug
+	debugDATA(data); //debug
+	getMaxData(data);
 
 	return data;
-}
-
-ACOORD getMaxData(DATA data) {
-	ACOORD coords(data.mSize * data.mSize);
-	int count = 0;
-
-	for (int x = 0; x < data.mSize; x++) {
-		for (int y = 0; y < data.mSize; y++) {
-
-		}
-	}
-
-	return coords;
-}
-
-COORD getCoord(ACOORD coords) {
-	COORD coord;
-
-
-	return coord;
 }
 
 int main() {

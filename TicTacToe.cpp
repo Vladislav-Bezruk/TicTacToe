@@ -32,15 +32,26 @@ struct ACOORD {
 	}
 };
 
-struct DATAU {
+struct CELL {
 	int import;
-	int prob[4][2];
 	int type;
-	int count;
-	int** value;
 	int rept;
 
+	CELL() {
+		import = -2;
+		rept = 0;
+		type = 0;
+	}
+};
+
+struct DATAU {
+	int prob[4][2];
+	int count;
+	int** value;
+	CELL cell;
+
 	void create(int cPlayer) {
+
 		value = new int* [4];
 
 
@@ -55,10 +66,7 @@ struct DATAU {
 
 		}
 
-		import = -2;
-		rept = 0;
 		count = 0;
-		type = 0;
 	}
 };
 
@@ -128,9 +136,9 @@ void debugDATA(DATA data) {
 		for (int y = 0; y < data.mSize; y++) {
 			printf("x = %d, y = %d\n", x, y);
 
-			printf("\t import = %d\n", data.data[x][y].import);
-			printf("\t type = %d\n", data.data[x][y].type);
-			printf("\t rept = %d\n", data.data[x][y].rept);
+			printf("\t import = %d\n", data.data[x][y].cell.import);
+			printf("\t type = %d\n", data.data[x][y].cell.type);
+			printf("\t rept = %d\n", data.data[x][y].cell.rept);
 
 			//for (int i = 0; i <= data.data[x][y].count; i++) {
 			//	printf("\t \t count = %d\n", i);	
@@ -150,33 +158,18 @@ void printCoords(ACOORD coords) {
 ACOORD getMaxData(DATA data) {
 	int count = 0, maxImport = -2, minType = 2, maxRept = -1;
 
-	for (int x = 0; x < data.mSize; x++) { //calc maxImport
+	for (int x = 0; x < data.mSize; x++) {
 		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].import > maxImport) {
-				maxImport = data.data[x][y].import;
-			}
-		}
-	}
 
-	for (int x = 0; x < data.mSize; x++) { //calc minType
-		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].import == maxImport && data.data[x][y].type < minType) {
-				minType = data.data[x][y].type;
+			if (data.data[x][y].cell.import > maxImport || data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type < minType || data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept > maxRept) {
+				count = 0;
+				maxImport = data.data[x][y].cell.import;
+				minType = data.data[x][y].cell.type;
+				maxRept = data.data[x][y].cell.rept;
 			}
-		}
-	}
+		
 
-	for (int x = 0; x < data.mSize; x++) { //calc maxRept
-		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept > maxRept) {
-				maxRept = data.data[x][y].rept;
-			}
-		}
-	}
-
-	for (int x = 0; x < data.mSize; x++) { //calc count
-		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept == maxRept) {
+			if (data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept == maxRept) {
 				count++;
 			}
 		}
@@ -186,14 +179,14 @@ ACOORD getMaxData(DATA data) {
 
 	for (int x = 0; x < data.mSize; x++) { //add all coord
 		for (int y = 0; y < data.mSize; y++) {
-			if (data.data[x][y].import == maxImport && data.data[x][y].type == minType && data.data[x][y].rept == maxRept) {
+			if (data.data[x][y].cell.import == maxImport && data.data[x][y].cell.type == minType && data.data[x][y].cell.rept == maxRept) {
 				coords.add(x, y);
 			}
 		}
 	}
 
-	//printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
-	//printCoords(coords);
+	printf("maxImport = %d, minType = %d, maxRept = %d\n", maxImport, minType, maxRept);
+	printCoords(coords);
 
 	return coords;
 }
@@ -240,20 +233,20 @@ DATA calc(MAP map, int player, int cPlayer) {
 					}
 
 					for (int j = 0; j < 2; j++) { //calc rept
-						data.data[x][y].rept += (data.data[x][y].prob[i][j] > -1);
+						data.data[x][y].cell.rept += (data.data[x][y].prob[i][j] > -1);
 					}
 
 					//calc import and type
-					if (max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]) > data.data[x][y].import || (max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]) == data.data[x][y].import && data.data[x][y].prob[i][0] >= data.data[x][y].prob[i][1])) {
-						data.data[x][y].import = max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);
-						data.data[x][y].type = !isMax(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);
+					if (max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]) > data.data[x][y].cell.import || (max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]) == data.data[x][y].cell.import && data.data[x][y].prob[i][0] >= data.data[x][y].prob[i][1])) {
+						data.data[x][y].cell.import = max(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);
+						data.data[x][y].cell.type = !isMax(data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);
 					}
 				}
 			}
 		}
 	}
 
-	//debugDATA(data); //debug
+	debugDATA(data); //debug
 
 	return data;
 }
@@ -268,7 +261,7 @@ int main() {
 		}
 	}
 
-	printf("x = %d, y = %d\n", getRandomCoord(getMaxData(calc(map, 1, 2))).x, getRandomCoord(getMaxData(calc(map, 1, 2))).y);
+	printf("Result: x = %d, y = %d\n", getRandomCoord(getMaxData(calc(map, 1, 2))).x, getRandomCoord(getMaxData(calc(map, 1, 2))).y);
 
 
 

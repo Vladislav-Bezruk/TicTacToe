@@ -1,33 +1,60 @@
-﻿#include <stdio.h>
+﻿#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <math.h>
+#include <string>
+#include <windows.h>
 
-struct COORD {
+using namespace std;
+
+struct SYMBOL {
+	unsigned char color;
+	unsigned char text;
+};
+
+struct PICTURE {
+	int width;
+	int height;
+
+	SYMBOL** symbols;
+
+	PICTURE(int w, int h) {
+		width = w;
+		height = h;
+
+		symbols = new SYMBOL * [h];
+
+		for (int i = 0; i < h; i++) {
+			symbols[i] = new SYMBOL[w];
+		}
+	}
+};
+
+struct COOR {
 	int x;
 	int y;
 
-	COORD() {
+	COOR() {
 		x = 0;
 		y = 0;
 	}
 };
 
-struct ACOORD {
-	COORD * data;
+struct ACOOR {
+	COOR* data;
 	int size;
 	int pos;
 
-	ACOORD(int a) {
+	ACOOR(int a) {
 		size = a;
-		data = new COORD[size];
+		data = new COOR[size];
 		pos = -1;
 	}
 
 	void add(int x, int y) {
 		pos++;
 
-		data[pos].x = x; 
+		data[pos].x = x;
 		data[pos].y = y;
 	}
 };
@@ -116,42 +143,8 @@ struct MAP {
 	}
 };
 
-int max(int a, int b) {
-	if (a >= b) {
-		return a;
-	}
-	return b;
-}
-
 int isMax(int a, int b) {
 	return a == max(a, b);
-}
-
-void debugDATA(DATA data) {
-	printf("////debugDATA////\n");
-	for (int x = 0; x < data.mSize; x++) {
-		for (int y = 0; y < data.mSize; y++) {
-			printf("x = %d, y = %d\n", x, y);
-
-			printf("\t import = %d\n", data.data[x][y].cell.import);
-			printf("\t type = %d\n", data.data[x][y].cell.type);
-			printf("\t rept = %d\n", data.data[x][y].cell.rept);
-
-			/*
-			for (int i = 0; i <= data.data[x][y].count; i++) {
-			//	printf("\t \t count = %d\n", i);	
-			//	printf("\t \t \t prob0 = %d, prob1 = %d\n", data.data[x][y].prob[i][0], data.data[x][y].prob[i][1]);			
-			}
-			*/
-		}
-	}
-}
-
-void printCoords(ACOORD coords) {
-	printf("////PrintResult:////\n");
-	for (int i = 0; i < coords.size; i++) {
-		printf("x = %d, y = %d\n", coords.data[i].x, coords.data[i].y);
-	}
 }
 
 bool isMaxCell(CELL a, CELL b) {
@@ -196,9 +189,9 @@ int countInData(DATA data, CELL maxCell) {
 	return count;
 }
 
-ACOORD getMaxData(DATA data) {
+ACOOR getMaxData(DATA data) {
 	CELL maxCell = getMaxCell(data);
-	ACOORD coords(countInData(data, maxCell));
+	ACOOR coords(countInData(data, maxCell));
 
 	for (int x = 0; x < data.mSize; x++) { //add all coord
 		for (int y = 0; y < data.mSize; y++) {
@@ -208,8 +201,6 @@ ACOORD getMaxData(DATA data) {
 		}
 	}
 
-	//printCoords(coords);
-
 	return coords;
 }
 
@@ -217,7 +208,7 @@ int random(int a) {
 	return round((a - 1) * (double)(rand() % 100) / 100);
 }
 
-COORD getRandomCoord(ACOORD coords) {
+COOR getRandomCoord(ACOOR coords) {
 	srand(time(NULL));
 	return coords.data[random(coords.size)];
 }
@@ -268,8 +259,6 @@ DATA calc(MAP map, int player, int cPlayer) {
 		}
 	}
 
-	//debugDATA(data); //debug
-
 	return data;
 }
 
@@ -279,12 +268,18 @@ int main() {
 
 	for (int i = 0; i < map.mSize; i++) {
 		for (int j = 0; j < map.mSize; j++) {
-			scanf_s("%d", &map.value[i][j]);
+			cin >> map.value[i][j];
 		}
 	}
 
 	//test
-	printf("Result: x = %d, y = %d\n", getRandomCoord(getMaxData(calc(map, 1, 2))).x, getRandomCoord(getMaxData(calc(map, 1, 2))).y);
+	cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
+
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	for (int k = 1; k < 255; k++) {
+		SetConsoleTextAttribute(hConsole, k);
+		cout << k << " I love Valeriy!" << endl;
+	}
 
 	return 0;
 }

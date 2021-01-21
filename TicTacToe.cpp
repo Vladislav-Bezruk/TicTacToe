@@ -5,11 +5,23 @@
 #include <string>
 #include <windows.h>
 
+#define defColor 15
+#define uc unsigned char
+
 using namespace std;
 
 struct SYMBOL {
-	unsigned char color;
-	unsigned char text;
+	uc color;
+	uc text;
+
+	SYMBOL() {
+		color = defColor;
+	}
+
+	SYMBOL(uc c, uc t) {
+		color = c;
+		text = t;
+	}
 };
 
 struct PICTURE {
@@ -18,14 +30,18 @@ struct PICTURE {
 
 	SYMBOL** symbols;
 
-	PICTURE(int w, int h) {
+	PICTURE(int h, int w, SYMBOL s[]) {
 		width = w;
 		height = h;
 
-		symbols = new SYMBOL * [h];
+		symbols = new SYMBOL* [h];
 
 		for (int i = 0; i < h; i++) {
 			symbols[i] = new SYMBOL[w];
+			
+			for (int j = 0; j < w; j++) {
+				symbols[i][j] = s[i * h + j];
+			}
 		}
 	}
 };
@@ -142,6 +158,20 @@ struct MAP {
 		}
 	}
 };
+
+void printPicture(PICTURE picture) {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	for (int x = 0; x < picture.height; x++) {
+		for (int y = 0; y < picture.width; y++) {
+			SetConsoleTextAttribute(hConsole, picture.symbols[x][y].color);
+			cout << picture.symbols[x][y].text;
+		}
+		cout << endl;
+	}
+
+	SetConsoleTextAttribute(hConsole, defColor);
+}
 
 int isMax(int a, int b) {
 	return a == max(a, b);
@@ -262,7 +292,25 @@ DATA calc(MAP map, int player, int cPlayer) {
 	return data;
 }
 
+SYMBOL cSym(uc c, uc t) {
+	SYMBOL s(c, t);
+	return s;
+
+}
+
+/* //test PICTURE
+SYMBOL s[3][3] = {
+   { cSym(defColor, 'a'), cSym(defColor, 'b'), cSym(defColor, 'c')},
+   { cSym(defColor, 'e'), cSym(defColor, 'f'), cSym(defColor, 'g')},
+   { cSym(defColor, 'h'), cSym(defColor, 'k'), cSym(defColor, 'l')}
+};
+PICTURE welcome(3, 3, &s[0][0]);
+*/
+
 int main() {
+
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, defColor);
 
 	MAP map(3);
 
@@ -275,11 +323,7 @@ int main() {
 	//test
 	cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
 
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	for (int k = 1; k < 255; k++) {
-		SetConsoleTextAttribute(hConsole, k);
-		cout << k << " I love Valeriy!" << endl;
-	}
+	printPicture(welcome);
 
 	return 0;
 }

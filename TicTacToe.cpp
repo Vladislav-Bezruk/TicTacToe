@@ -1,13 +1,29 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <math.h>
 #include <string>
 #include <windows.h>
 
+#define nLines 7
+
 #define defColor 15
+#define Black 0
+#define DarkBlue 1
+#define DarkGreen 2
+#define LightBlue 3
+#define DarkRed 4
+#define Magenta 5
+#define Orange 6
+#define LightGray 7
+#define Gray 8
+#define Blue 9
 #define Green 10
+#define Cyan 11
 #define Red 12
+#define Pink 13
+#define Yellow 14
+#define White 15
 
 #define uc unsigned char
 
@@ -15,11 +31,13 @@ using namespace std;
 
 struct ASTR {
 	string * str;
+	uc color;
 	int size;
 
-	ASTR(int a, string* b) {
+	ASTR(int a, string* b, int c) {
 		size = a;
 		str = b;
+		color = c;
 	}
 };
 
@@ -168,7 +186,7 @@ struct MAP {
 	}
 };
 
-void printPicture(PICTURE picture) {
+void printPicture(PICTURE picture, bool newLine) {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	for (int x = 0; x < picture.height; x++) {
@@ -176,7 +194,9 @@ void printPicture(PICTURE picture) {
 			SetConsoleTextAttribute(hConsole, picture.symbols[x][y].color);
 			cout << picture.symbols[x][y].text;
 		}
-		cout << endl;
+		if (newLine == true) {
+			cout << endl;
+		}
 	}
 
 	SetConsoleTextAttribute(hConsole, defColor);
@@ -308,10 +328,7 @@ PICTURE convert(ASTR s) {
 		for (int j = 0; j < s.str[0].length(); j++) {
 			picture.symbols[i][j].text = s.str[i][j];
 			if (s.str[i][j] != ' ') {
-				picture.symbols[i][j].color = Green;
-			}
-			else {
-				picture.symbols[i][j].color = defColor;
+				picture.symbols[i][j].color = s.color;
 			}
 		}
 	}
@@ -319,7 +336,7 @@ PICTURE convert(ASTR s) {
 	return picture;
 }
 
-ASTR convertS(initializer_list<string> sl) {
+ASTR convertS(int color, initializer_list<string> sl) {
 	string * s = new string [sl.size()];
 	int i = 0;
 
@@ -327,35 +344,104 @@ ASTR convertS(initializer_list<string> sl) {
 		s[i] = si;
 		i++;
 	}
-	ASTR as(sl.size(), s);
+	ASTR as(sl.size(), s, color);
 	return as;
 }
 
-PICTURE welcome = convert(convertS({
-	{ "                     $$   $ $$$$$  $$      $$$$   $$$$  $$   $ $$$$$                      "},
-	{ "                     $$   $ $$     $$     $$  $$ $$  $$ $$$ $$ $$                         "},
-	{ "                     $$ $ $ $$$$   $$     $$     $$  $$ $$ $ $ $$$$                       "},
-	{ "                     $$$$$$ $$     $$     $$  $$ $$  $$ $$   $ $$                         "},
-	{ "                      $$ $$ $$$$$  $$$$$$  $$$$   $$$$  $$   $ $$$$$                      "},
-	{ "                                                                                          "},
-	{ "              $$$$$$ $$$$$$  $$$$  $$$$$$  $$$$   $$$$  $$$$$$  $$$$  $$$$$               "},
-	{ "                $$     $$   $$  $$   $$   $$  $$ $$  $$   $$   $$  $$ $$                  "},
-	{ "                $$     $$   $$       $$   $$$$$$ $$       $$   $$  $$ $$$$                "},
-	{ "                $$     $$   $$  $$   $$   $$  $$ $$  $$   $$   $$  $$ $$                  "},
-	{ "                $$   $$$$$$  $$$$    $$   $$  $$  $$$$    $$    $$$$  $$$$$               "},
-	{ "                                                                                          "},
-	{ "$$$$$  $$  $$    $$  $$ $$      $$$$  $$$$$  $$$$$$  $$$$  $$      $$$$  $$  $$  $$$$$    "},
-	{ "$$  $$  $$$$     $$  $$ $$     $$  $$ $$  $$   $$   $$     $$     $$  $$ $$  $$  $$  $$   "},
-	{ "$$$$$    $$      $$  $$ $$     $$$$$$ $$  $$   $$    $$$$  $$     $$$$$$ $$  $$  $$$$$    "},
-	{ "$$  $$   $$       $$$$  $$     $$  $$ $$  $$   $$       $$ $$     $$  $$  $$$$   $$  $$   "},
-	{ "$$$$$    $$        $$   $$$$$$ $$  $$ $$$$$  $$$$$$  $$$$  $$$$$$ $$  $$   $$    $$$$$  $$"}
+PICTURE null[nLines]= { convert(convertS(defColor, {
+	{ "        "}
+	})), convert(convertS(defColor, {
+	{ " ~~~~~~ "}
+	})), convert(convertS(defColor, {
+	{ " ~~~~~~ "}
+	})), convert(convertS(defColor, {
+	{ " ~~~~~~ "}
+	})), convert(convertS(defColor, {
+	{ " ~~~~~~ "}
+	})), convert(convertS(defColor, {
+	{ " ~~~~~~ "}
+	})), convert(convertS(defColor, {
+	{ "        "}
+	})) };
+
+PICTURE cross[nLines] = { convert(convertS(Green, {
+	{ "        "}
+	})), convert(convertS(Green, {
+	{ " $$  $$ "}
+	})), convert(convertS(Green, {
+	{ "  $$$$  "}
+	})), convert(convertS(Green, {
+	{ "   $$   " }
+	})), convert(convertS(Green, {
+	{ "  $$$$  " }
+	})), convert(convertS(Green, {
+	{ " $$  $$ " }
+	})), convert(convertS(Green, {
+	{ "        " }
+	})) };
+
+PICTURE naught[nLines] = { convert(convertS(Red, {
+	{ "        "}
+	})), convert(convertS(Red, {
+	{ "  $$$$  "}
+	})), convert(convertS(Red, {
+	{ " $$  $$ "}
+	})), convert(convertS(Red, {
+	{ " $$  $$ " }
+	})), convert(convertS(Red, {
+	{ " $$  $$ " }
+	})), convert(convertS(Red, {
+	{ "  $$$$  " }
+	})), convert(convertS(Red, {
+	{ "        " }
+	})) };
+
+void printMap(MAP map) {
+	for (int x = 0; x < map.mSize; x++) {
+
+		for (int i = 0; i < nLines; i++) {
+			for (int y = 0; y < map.mSize; y++) {
+				if (map.value[x][y] == 1) {
+					printPicture(cross[i], false);
+				}
+				if (map.value[x][y] == 2) {
+					printPicture(naught[i], false);
+				}
+				if (map.value[x][y] == 0) {
+					printPicture(null[i], false);
+				}
+			}
+			cout << endl;
+		}
+	}
+
+}
+
+PICTURE welcome = convert(convertS(Blue,  {
+	{ "                     $$   $ $$$$$  $$      $$$$   $$$$  $$   $$ $$$$$                      "},
+	{ "                     $$   $ $$     $$     $$  $$ $$  $$ $$$ $$$ $$                         "},
+	{ "                     $$ $ $ $$$$   $$     $$     $$  $$ $$ $ $$ $$$$                       "},
+	{ "                     $$$$$$ $$     $$     $$  $$ $$  $$ $$   $$ $$                         "},
+	{ "                      $$ $$ $$$$$  $$$$$$  $$$$   $$$$  $$   $$ $$$$$                      "},
+	{ "                                                                                           "},
+	{ "              $$$$$$ $$$$$$  $$$$  $$$$$$  $$$$   $$$$  $$$$$$  $$$$  $$$$$                "},
+	{ "                $$     $$   $$  $$   $$   $$  $$ $$  $$   $$   $$  $$ $$                   "},
+	{ "                $$     $$   $$       $$   $$$$$$ $$       $$   $$  $$ $$$$                 "},
+	{ "                $$     $$   $$  $$   $$   $$  $$ $$  $$   $$   $$  $$ $$                   "},
+	{ "                $$   $$$$$$  $$$$    $$   $$  $$  $$$$    $$    $$$$  $$$$$                "},
+	{ "                                                                                           "},
+	{ "$$$$$  $$  $$    $$  $$ $$      $$$$  $$$$$  $$$$$$  $$$$  $$      $$$$  $$  $$   $$$$$    "},
+	{ "$$  $$  $$$$     $$  $$ $$     $$  $$ $$  $$   $$   $$     $$     $$  $$ $$  $$   $$  $$   "},
+	{ "$$$$$    $$      $$  $$ $$     $$$$$$ $$  $$   $$    $$$$  $$     $$$$$$ $$  $$   $$$$$    "},
+	{ "$$  $$   $$       $$$$  $$     $$  $$ $$  $$   $$       $$ $$     $$  $$  $$$$    $$  $$   "},
+	{ "$$$$$    $$        $$   $$$$$$ $$  $$ $$$$$  $$$$$$  $$$$  $$$$$$ $$  $$   $$     $$$$$  $$"}
 	}));
 
 int main() {
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	printPicture(welcome);
+	printPicture(welcome, true);
 
 	MAP map(3);
 
@@ -365,8 +451,10 @@ int main() {
 		}
 	}
 
+	printMap(map);
+
 	//test
-	cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
+	//cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
 
 	return 0;
 }

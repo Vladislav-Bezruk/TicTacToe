@@ -7,6 +7,9 @@
 
 #define nLines 7
 
+#define defHeight 7
+#define defWidth 8
+
 #define defColor 15
 #define Black 0
 #define DarkBlue 1
@@ -61,6 +64,10 @@ struct PICTURE {
 
 	SYMBOL** symbols;
 
+	PICTURE() {
+
+	}
+
 	PICTURE(int h, int w) {
 		width = w;
 		height = h;
@@ -69,6 +76,23 @@ struct PICTURE {
 
 		for (int i = 0; i < h; i++) {
 			symbols[i] = new SYMBOL[w];
+		}
+	}
+};
+
+struct APICTURE {
+	PICTURE** pictures;
+	int width;
+	int height;
+
+	APICTURE(int a, int b) {
+		height = a;
+		width = b;
+
+		pictures = new PICTURE * [height];
+
+		for (int i = 0; i < height; i++) {
+			pictures[i] = new PICTURE [width];
 		}
 	}
 };
@@ -272,13 +296,12 @@ COOR getRandomCoord(ACOOR coords) {
 	return coords.data[random(coords.size)];
 }
 
-DATA calc(MAP map, int player, int cPlayer) {
+DATA calcValue(MAP map, int cPlayer, bool analyze) {
 	DATA data(cPlayer, map.mSize);
 
 	for (int x = 0; x < map.mSize; x++) {
 		for (int y = 0; y < map.mSize; y++) {
-			if (map.value[x][y] == 0) {
-
+			if (map.value[x][y] == 0 || analyze == true) {
 				for (int a = 0; a < map.mSize; a++) { //calc value
 					data.add(x, y, 0, map.value[a][y]);
 					data.add(x, y, 1, map.value[x][a]);
@@ -289,7 +312,49 @@ DATA calc(MAP map, int player, int cPlayer) {
 						data.add(x, y, 2 + (x == y), map.value[a][map.mSize - (a + 1)]);
 					}
 				}
+			}
+		}
+	}
 
+	return data;
+}
+
+ACOOR analyzeGame(MAP map, int cPlayer) {
+	ACOOR coords(map.mSize);
+	DATA data = calcValue(map, cPlayer, true);
+
+	for (int x = 0; x < map.mSize; x++) {
+		for (int y = 0; y < map.mSize; y++) {
+			for (int i = 0; i <= data.data[x][y].count; i++) {
+				for (int j = 1; j <= cPlayer; j++) {
+					if (data.data[x][y].value[i][j] == map.mSize) {
+						coords.add(x, y);
+					}
+				}
+			}
+		}
+	}
+
+	return coords;
+}
+
+bool isFull(MAP map) {
+	for (int x = 0; x < map.mSize; x++) {
+		for (int y = 0; y < map.mSize; y++) {
+			if (map.value[x][y] == 0) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+DATA calc(MAP map, int player, int cPlayer) {
+	DATA data = calcValue(map, cPlayer, false);
+
+	for (int x = 0; x < map.mSize; x++) {
+		for (int y = 0; y < map.mSize; y++) {
+			if (map.value[x][y] == 0) {
 				for (int i = 0; i <= data.data[x][y].count; i++) { //calc prob
 					data.data[x][y].prob[i][0] = data.data[x][y].prob[i][1] = -1;
 
@@ -348,73 +413,91 @@ ASTR convertS(int color, initializer_list<string> sl) {
 	return as;
 }
 
-PICTURE null[nLines]= { convert(convertS(defColor, {
+PICTURE null = convert(convertS(defColor, {
+	{ "        "},	
+	{ " ~~~~~~ "},
+	{ " ~~~~~~ "},
+	{ " ~~~~~~ "},
+	{ " ~~~~~~ "},
+	{ " ~~~~~~ "},
 	{ "        "}
-	})), convert(convertS(defColor, {
-	{ " ~~~~~~ "}
-	})), convert(convertS(defColor, {
-	{ " ~~~~~~ "}
-	})), convert(convertS(defColor, {
-	{ " ~~~~~~ "}
-	})), convert(convertS(defColor, {
-	{ " ~~~~~~ "}
-	})), convert(convertS(defColor, {
-	{ " ~~~~~~ "}
-	})), convert(convertS(defColor, {
+	}));
+
+PICTURE cross = convert(convertS(Green, {
+	{ "        "},
+	{ " $$  $$ "},
+	{ "  $$$$  "},
+	{ "   $$   "},
+	{ "  $$$$  "},
+	{ " $$  $$ "},
 	{ "        "}
-	})) };
+	}));
 
-PICTURE cross[nLines] = { convert(convertS(Green, {
+PICTURE naught = convert(convertS(Red, {
+	{ "        "},
+	{ "  $$$$  "},
+	{ " $$  $$ "},
+	{ " $$  $$ "},
+	{ " $$  $$ "},
+	{ "  $$$$  "},
 	{ "        "}
-	})), convert(convertS(Green, {
-	{ " $$  $$ "}
-	})), convert(convertS(Green, {
-	{ "  $$$$  "}
-	})), convert(convertS(Green, {
-	{ "   $$   " }
-	})), convert(convertS(Green, {
-	{ "  $$$$  " }
-	})), convert(convertS(Green, {
-	{ " $$  $$ " }
-	})), convert(convertS(Green, {
-	{ "        " }
-	})) };
+	}));
 
-PICTURE naught[nLines] = { convert(convertS(Red, {
+PICTURE square = convert(convertS(Blue, {
+	{ "        "},
+	{ " $$$$$$ "},
+	{ " $$  $$ "},
+	{ " $$  $$ "},
+	{ " $$  $$ "},
+	{ " $$$$$$ "},
 	{ "        "}
-	})), convert(convertS(Red, {
-	{ "  $$$$  "}
-	})), convert(convertS(Red, {
-	{ " $$  $$ "}
-	})), convert(convertS(Red, {
-	{ " $$  $$ " }
-	})), convert(convertS(Red, {
-	{ " $$  $$ " }
-	})), convert(convertS(Red, {
-	{ "  $$$$  " }
-	})), convert(convertS(Red, {
-	{ "        " }
-	})) };
+	}));
 
-void printMap(MAP map) {
-	for (int x = 0; x < map.mSize; x++) {
+PICTURE triangle = convert(convertS(Yellow, {
+	{ "        "},
+	{ "   $$   "},
+	{ "   $$   "},
+	{ "  $$$$  "},
+	{ "  $$$$  "},
+	{ " $$$$$$ "},
+	{ "        "}
+	}));
 
-		for (int i = 0; i < nLines; i++) {
-			for (int y = 0; y < map.mSize; y++) {
-				if (map.value[x][y] == 1) {
-					printPicture(cross[i], false);
-				}
-				if (map.value[x][y] == 2) {
-					printPicture(naught[i], false);
-				}
-				if (map.value[x][y] == 0) {
-					printPicture(null[i], false);
-				}
-			}
-			cout << endl;
+PICTURE makePicture(APICTURE p) {
+	PICTURE picture(p.height * p.pictures[0][0].height, p.width * p.pictures[0][0].width);
+
+	for (int x = 0; x < picture.height; x++) {
+		for (int y = 0; y < picture.width; y++) {
+			picture.symbols[x][y] = p.pictures[x / p.pictures[0][0].height][y / p.pictures[0][0].width].symbols[x - int(x / p.pictures[0][0].height) * p.pictures[0][0].height][y - int(y / p.pictures[0][0].width) * p.pictures[0][0].width];
 		}
 	}
 
+	return picture;
+}
+
+APICTURE makeAPicture(MAP map) {
+	APICTURE p(map.mSize, map.mSize);
+
+	for (int x = 0; x < map.mSize; x++) {
+		for (int y = 0; y < map.mSize; y++) {
+			if (map.value[x][y] == 0) {
+				p.pictures[x][y] = null;
+			}
+			if (map.value[x][y] == 1) {
+				p.pictures[x][y] = cross;
+			}
+			if (map.value[x][y] == 2) {
+				p.pictures[x][y] = naught;
+			}
+			if (map.value[x][y] == 3) {
+				p.pictures[x][y] = square;
+			}
+			if (map.value[x][y] == 4) {
+				p.pictures[x][y] = triangle;
+			}
+		}
+	}
+	return p;
 }
 
 PICTURE welcome = convert(convertS(Blue,  {
@@ -451,10 +534,14 @@ int main() {
 		}
 	}
 
-	printMap(map);
+	printPicture(makePicture(makeAPicture(map)), true);
 
 	//test
 	//cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
+
+	ACOOR coords = analyzeGame(map, 2);
+
+	//cout << coords.pos << endl;
 
 	return 0;
 }

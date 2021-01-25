@@ -7,6 +7,8 @@
 
 #define nLines 7
 
+#define d 100
+
 #define defHeight 7
 #define defWidth 8
 
@@ -520,6 +522,91 @@ PICTURE welcome = convert(convertS(Blue,  {
 	{ "$$$$$    $$        $$   $$$$$$ $$  $$ $$$$$  $$$$$$  $$$$  $$$$$$ $$  $$   $$     $$$$$  $$"}
 	}));
 
+bool isWin(ACOOR coords, int mSize) {
+	if (coords.pos == mSize - 1) {
+		return true;
+	}
+	return false;
+}
+
+COOR getMinCoord(ACOOR coords, int mSize) {
+	int minX = mSize, minY = mSize;
+	int cX = 0, cY = 0, iX, iY;
+
+	for (int i = 0; i < coords.size; i++) {
+		if (coords.data[i].x == minX) {
+			cX++;
+		}
+		if (coords.data[i].y == minY) {
+			cY++;
+		}
+		if (coords.data[i].x < minX) {
+			iX = i;
+			minX = coords.data[i].x;
+			cX = 1;
+		}
+		if (coords.data[i].y < minY) {
+			iY = i;
+			minY = coords.data[i].y;
+			cY = 1;
+		}
+	}
+
+	if (cX == 1) {
+		return coords.data[iX];
+	}
+	if (cY == 1) {
+		return coords.data[iY];
+	}
+}
+
+COOR getMaxCoord(ACOOR coords, int mSize) {
+	int maxX = -1, maxY = -1;
+	int cX = 0, cY = 0, iX, iY;
+
+	for (int i = 0; i < coords.size; i++) {
+		if (coords.data[i].x == maxX) {
+			cX++;
+		}
+		if (coords.data[i].y == maxY) {
+			cY++;
+		}
+		if (coords.data[i].x > maxX) {
+			iX = i;
+			maxX = coords.data[i].x;
+			cX = 1;
+		}
+		if (coords.data[i].y > maxY) {
+			iY = i;
+			maxY = coords.data[i].y;
+			cY = 1;
+		}
+	}
+
+	if (cX == 1) {
+		return coords.data[iX];
+	}
+	if (cY == 1) {
+		return coords.data[iY];
+	}
+}
+
+PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size) {
+	int k = d;
+	for (int i = 0; i <= k; i++) {
+		for (int dx = -1 * size; dx <= size; dx++) {
+			
+			int tY = a.y + (i * (b.y - a.y) / k);
+			int tX = a.x + (i * (b.x - a.x) / k) + dx;
+			
+			picture.symbols[tX][tY].color = Orange;
+			picture.symbols[tX][tY].text = '&';
+		}
+	}
+
+	return picture;
+}
+
 int main() {
 
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -534,12 +621,31 @@ int main() {
 		}
 	}
 
-	printPicture(makePicture(makeAPicture(map)), true);
-
 	//test
 	//cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
 
-	ACOOR coords = analyzeGame(map, 2);
+	ACOOR coords = analyzeGame(map, 4);
+	if (isWin(coords, map.mSize)) {
+		//cout << getMinCoord(coords, map.mSize).x << " " << getMinCoord(coords, map.mSize).y << " " << getMaxCoord(coords, map.mSize).x << " " << getMaxCoord(coords, map.mSize).y << endl;
+
+		COOR a = getMinCoord(coords, map.mSize);
+		COOR b = getMaxCoord(coords, map.mSize);
+
+		//cout << a.x << " " << a.y << " " << b.x << " " << b.y << endl;
+
+		a.x = a.x * defHeight + defHeight / 2;
+		a.y = a.y * defWidth + defWidth / 2;
+
+		b.x = b.x * defHeight + defHeight / 2;
+		b.y = b.y * defWidth + defWidth / 2;
+
+		//cout << a.x << " " << a.y << " " << b.x << " " << b.y << endl;
+
+		printPicture(drawLine(makePicture(makeAPicture(map)), a, b, 1), true);
+	}
+	else {
+		printPicture(makePicture(makeAPicture(map)), true);
+	}
 
 	//cout << coords.pos << endl;
 

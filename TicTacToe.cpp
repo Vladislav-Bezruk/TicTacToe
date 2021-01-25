@@ -605,7 +605,7 @@ bool isAvbls(int x, int y, int xMax, int yMax) {
 	return false;
 }
 
-PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size) {
+PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size, int color) {
 	int k = d;
 	for (int i = 0; i <= k; i++) {
 		int tX, tY;
@@ -615,7 +615,7 @@ PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size) {
 				int tY = a.y + (i * (b.y - a.y) / k) + dy;
 				
 				if (isAvbls(tX, tY, picture.height, picture.width)) {
-					picture.symbols[tX][tY].color = Orange;
+					picture.symbols[tX][tY].color = color;
 					picture.symbols[tX][tY].text = '&';
 				}	
 			}
@@ -623,6 +623,12 @@ PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size) {
 	}
 
 	return picture;
+}
+
+COOR convertToS(COOR a) {
+	a.x = a.x * defHeight + defHeight / 2;
+	a.y = a.y * defWidth + defWidth / 2;
+	return a;
 }
 
 int main() {
@@ -639,34 +645,14 @@ int main() {
 		}
 	}
 
-	//test
-	//cout << "Result: x = " << getRandomCoord(getMaxData(calc(map, 1, 2))).x << " y = " << getRandomCoord(getMaxData(calc(map, 1, 2))).y << endl;
-
 	ACOOR coords = analyzeGame(map, 4);
+	PICTURE m = makePicture(makeAPicture(map));
 	if (isWin(coords, map.mSize)) {
-		//cout << getMinCoord(coords, map.mSize).x << " " << getMinCoord(coords, map.mSize).y << " " << getMaxCoord(coords, map.mSize).x << " " << getMaxCoord(coords, map.mSize).y << endl;
-
-		COOR a = getMinCoord(coords, map.mSize);
-		COOR b = getMaxCoord(coords, map.mSize);
-
-		//cout << a.x << " " << a.y << " " << b.x << " " << b.y << endl;
-
-		a.x = a.x * defHeight + defHeight / 2;
-		a.y = a.y * defWidth + defWidth / 2;
-
-		b.x = b.x * defHeight + defHeight / 2;
-		b.y = b.y * defWidth + defWidth / 2;
-
-		//cout << a.x << " " << a.y << " " << b.x << " " << b.y << endl;
-
-		printPicture(drawLine(makePicture(makeAPicture(map)), a, b, 1), true);
+		m = drawLine(m, convertToS(getMinCoord(coords, map.mSize)), convertToS(getMaxCoord(coords, map.mSize)), 1, LightBlue);
 	}
-	else {
-		printPicture(makePicture(makeAPicture(map)), true);
-	}
-
-	//cout << coords.pos << endl;
-
+	
+	printPicture(m, true);
+	
 	return 0;
 }
 

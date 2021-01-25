@@ -591,16 +591,34 @@ COOR getMaxCoord(ACOOR coords, int mSize) {
 	}
 }
 
+bool isAvbl(int a, int aMax) {
+	if (a >= 0 && a < aMax) {
+		return true;
+	}
+	return false;
+}
+
+bool isAvbls(int x, int y, int xMax, int yMax) {
+	if (isAvbl(x, xMax) && isAvbl(y, yMax)) {
+		return true;
+	}
+	return false;
+}
+
 PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size) {
 	int k = d;
 	for (int i = 0; i <= k; i++) {
+		int tX, tY;
 		for (int dx = -1 * size; dx <= size; dx++) {
-			
-			int tY = a.y + (i * (b.y - a.y) / k);
 			int tX = a.x + (i * (b.x - a.x) / k) + dx;
-			
-			picture.symbols[tX][tY].color = Orange;
-			picture.symbols[tX][tY].text = '&';
+			for (int dy = -1 * size; dy <= size; dy++) {
+				int tY = a.y + (i * (b.y - a.y) / k) + dy;
+				
+				if (isAvbls(tX, tY, picture.height, picture.width)) {
+					picture.symbols[tX][tY].color = Orange;
+					picture.symbols[tX][tY].text = '&';
+				}	
+			}
 		}
 	}
 

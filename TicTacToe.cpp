@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <math.h>
@@ -522,6 +522,38 @@ PICTURE welcome = convert(convertS(Blue,  {
 	{ "$$$$$    $$        $$   $$$$$$ $$  $$ $$$$$  $$$$$$  $$$$  $$$$$$ $$  $$   $$     $$$$$  $$"}
 	}));
 
+PICTURE win = convert(convertS(Green, {
+	{ "                             "},
+	{ "   $$  $$   $$$$   $$  $$    "},
+	{ "    $$$$   $$  $$  $$  $$    "},
+	{ "     $$    $$  $$  $$  $$    "},
+	{ "     $$    $$  $$  $$  $$    "},
+	{ "     $$     $$$$    $$$$     "},
+	{ "                             "},
+	{ "$$   $$ $$$$$$  $$  $$    $$$"},
+	{ "$$   $$   $$    $$$ $$    $$$"},
+	{ "$$ $ $$   $$    $$ $$$    $$$"},
+	{ "$$$$$$$   $$    $$  $$       "},
+	{ " $$ $$  $$$$$$  $$  $$    $$$"},
+	{ "                             "}
+	}));
+
+PICTURE lose = convert(convertS(Red, {
+	{ "                             "},
+	{ "   $$  $$   $$$$   $$  $$    "},
+	{ "    $$$$   $$  $$  $$  $$    "},
+	{ "     $$    $$  $$  $$  $$    "},
+	{ "     $$    $$  $$  $$  $$    "},
+	{ "     $$     $$$$    $$$$     "},
+	{ "                             "},
+	{ "$$    $$$$   $$$$  $$$$$  $$$"},
+	{ "$$   $$  $$ $$     $$     $$$"},
+	{ "$$   $$  $$  $$$$  $$$$   $$$"},
+	{ "$$   $$  $$     $$ $$        "},
+	{ "$$$$  $$$$   $$$$  $$$$$  $$$"},
+	{ "                             "}
+	}));
+
 bool isWin(ACOOR coords, int mSize) {
 	if (coords.pos == mSize - 1) {
 		return true;
@@ -605,7 +637,7 @@ bool isAvbls(int x, int y, int xMax, int yMax) {
 	return false;
 }
 
-PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size, int color) {
+PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size, int color, char sym) {
 	int k = d;
 	for (int i = 0; i <= k; i++) {
 		int tX, tY;
@@ -616,7 +648,7 @@ PICTURE drawLine(PICTURE picture, COOR a, COOR b, int size, int color) {
 				
 				if (isAvbls(tX, tY, picture.height, picture.width)) {
 					picture.symbols[tX][tY].color = color;
-					picture.symbols[tX][tY].text = '&';
+					picture.symbols[tX][tY].text = sym;
 				}	
 			}
 		}
@@ -636,9 +668,11 @@ int main() {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	printPicture(welcome, true);
+	printPicture(win, true);
+	printPicture(lose, true);
 
 	MAP map(3);
-
+	
 	for (int i = 0; i < map.mSize; i++) {
 		for (int j = 0; j < map.mSize; j++) {
 			cin >> map.value[i][j];
@@ -648,7 +682,7 @@ int main() {
 	ACOOR coords = analyzeGame(map, 4);
 	PICTURE m = makePicture(makeAPicture(map));
 	if (isWin(coords, map.mSize)) {
-		m = drawLine(m, convertToS(getMinCoord(coords, map.mSize)), convertToS(getMaxCoord(coords, map.mSize)), 1, LightBlue);
+		m = drawLine(m, convertToS(getMinCoord(coords, map.mSize)), convertToS(getMaxCoord(coords, map.mSize)), 1, LightBlue, '&');
 	}
 	
 	printPicture(m, true);

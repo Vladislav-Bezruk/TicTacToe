@@ -107,6 +107,10 @@ struct COOR {
 		x = 0;
 		y = 0;
 	}
+
+	void print() {
+		cout << endl << "x = " << x << " y = " << y << endl;
+	}
 };
 
 struct ACOOR {
@@ -668,8 +672,8 @@ int main() {
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	printPicture(welcome, true);
-	printPicture(win, true);
-	printPicture(lose, true);
+	//printPicture(win, true);
+	//printPicture(lose, true);
 
 	MAP map(3);
 	
@@ -677,6 +681,16 @@ int main() {
 		for (int j = 0; j < map.mSize; j++) {
 			cin >> map.value[i][j];
 		}
+	}
+
+	int cPlayer = 4;
+
+	for (int player = 1; player <= cPlayer; player++) {
+		COOR move = getRandomCoord(getMaxData(calc(map, player, cPlayer)));
+
+		cout << "for " << player << " player:";
+
+		move.print();
 	}
 
 	ACOOR coords = analyzeGame(map, 4);
